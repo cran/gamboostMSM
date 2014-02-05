@@ -1,0 +1,11 @@
+cf3053420c8821596e633ad0d2d77db3 *DESCRIPTION
+5c725928b402a837590980e3e23b8600 *NAMESPACE
+4b825b066678371c9f9aca1fdd9c6b70 *R/breslow.R
+4a2c80d3b2472643ead1a349b03c95c0 *R/dof.R
+c355113800d46ed6cac133ae5ca9cdbd *R/multistate.R
+91528924613d80974b49167607d85aa9 *R/toolbox.R
+247fe445e6d0e6ac7383539f34300dfc *man/breslow.Rd
+4be3edf096aafcc41aa7774710557df7 *man/dof.Rd
+f81d6a7b369051ab8f934a89cfd6457b *man/gamboostMSM-package.Rd
+6dd8a0b127781469522e6a926716f15d *man/multistate.Rd
+304c1b5870f08ba59faa5464bf54abd5 *man/toolbox.Rd
