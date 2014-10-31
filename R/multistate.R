@@ -1,20 +1,16 @@
-multistate <- function(trans = trans){
+multistate <- function(Ri = Ri, Ci = Ci){
     ## #########################################################
     ## negative log likelihood of a cox type multistate model ##
     ## a.k.a. partial likelihood loss function                ##
     ## #########################################################
     plloss <- function(y, f, w) {
-        entry <- y[, 1]
-        exit <- y[, 2]
         event <- y[, 3]
-        n <- length(entry)
+        n <- length(event)
         if (length(f) == 1) {f <- rep(f, n)}
         ef <- exp(f)
-        risk <- rep(0, n)
-        for (i in 1:n){risk[i] <- sum(as.numeric((entry < exit[i]) & (exit[i] <= exit) & (trans[i] == trans)) * ef)}
-        lpl <- event * (f - log(risk))
-        return(lpl)
-    }
+        risk <- do.call(c, lapply(X = Ri, FUN = helpfunctionmultistate1, ef = ef))
+        lpl <- sum(event * (f - log(risk)))
+        return(lpl)}
     ## #################################
     ## construct new boosting family ##
     ## #################################
@@ -23,40 +19,36 @@ multistate <- function(trans = trans){
     ## negative gradient of the loss function ##
     ## #########################################
     ngradient = function(y, f, w) {
-        entry <- y[, 1]
-        exit <- y[, 2]
-        trans = trans
-        event <- y[, 3]
-        n <- length(entry)
-        if (length(f) == 1){f <- rep(f, n)}
-        dummy <- rep(0, n)
-        ef <- exp(f)
-        ## nenner fuer jedes j ausrechnen (in jedem element summer ueber k)
-        for (j in 1:n){
-            dummy[j] <- sum(as.numeric((entry < exit[j]) & (exit[j] <= exit) & (trans[j] == trans)) * ef)
-        }
-        zi <- rep(0, n)
-        for(i in 1:n){
-            dummy[which(dummy==0.0)] <- 1.0
-            ## riskset im zaehler ausrechnen:
-            hi <- which((event > 0.5) & (entry[i] < exit) & (exit <= exit[i]) & (trans[i] == trans))
-            zi[i] = sum(1/dummy[hi])
-            ## for(j in 1:n){
-            ##    if((event[j]>0.5) & (entry[i]<exit[j]) & (exit[j]<=exit[i]) & (trans[i]==trans[j])){
-            ##        helpobject <- dummy[j]
-            ##        if(helpobject == 0.0){
-            ##            helpobject <- 1.0
-            ##        }
-            ##        helpobject <- ef[i]/helpobject
-            ##        zi[i] = zi[i] + helpobject
-            ##    }
-            ## }
-        }
-        zi <- event - (ef * zi)
-        return(zi)},
+      event <- y[, 3]
+      n <- length(event)
+      if(length(f) == 1){f <- rep(f, n)}
+      ef <- exp(f)
+      dummy <- secondpart <- rep(0, n)
+      dummy <- do.call(c, lapply(X = Ri, FUN = helpfunctionmultistate1, ef = ef))
+      dummy[which(dummy==0)] <- 1e-05
+      secondpart <- do.call(c, lapply(X = Ci, FUN = helpfunctionmultistate2, dummy = dummy))
+      gradients <- event - (ef*secondpart)
+      return(gradients)},
     ## ################
     ## risk function ##
     ## ################
     risk = risk <- function(y, f, w) -sum(plloss(y, f, w)),
+    ## ##################
+    ## offset function ##
+    ## ##################
     offset = function(y, w) 0,
-    name = "family for multistate models.")}
+    ## ################
+    ## loss function ##
+    ## ################
+    #loss = loss <- function(y, f) {
+    #    event <- y[, 3]
+    #    n <- length(event)
+    #    if (length(f) == 1) {f <- rep(f, n)}
+    #    ef <- exp(f)
+    #    risk <- rep(0, n)
+    #    for (i in 1:n) {
+    #        risk[i] <- sum(ef[riskset[[i]]])
+    #    }
+    #    lpl <- sum(event * (f - log(risk)))
+    #    return(-mean(lpl))},
+    name = "family for multistate models (2014-10-21).")}
