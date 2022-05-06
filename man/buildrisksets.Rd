@@ -1,8 +1,7 @@
 \name{buildrisksets}
 \alias{buildrisksets}
 \title{Calculation of risksets}
-\description{This function calculates the risksets needed to boost
-  multistate models using the family \code{multistate}.}
+\description{Calculates risksets needed for using family \code{multistate}.}
 \usage{
 buildrisksets(entry, exit, trans, event, statusinfo)
 }

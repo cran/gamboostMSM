@@ -7,8 +7,7 @@
 degreesoffreedom(m, statusinfo)
 }
 \arguments{
-  \item{m}{ a fitted multi state model using
-    \code{gamboost(..., family=multistate(...))}.}
+  \item{m}{ a boosted multi state model.}
   \item{statusinfo}{ a logical indicating if information on the
     calculation process should be printed.}
 }
